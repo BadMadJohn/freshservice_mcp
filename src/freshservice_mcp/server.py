@@ -1571,12 +1571,20 @@ async def send_ticket_reply(
 
 #CREATE A Note
 @mcp.tool()
-async def create_ticket_note(ticket_id: int,body: str)-> Dict[str, Any]:
-    """Create a note for a ticket in Freshservice."""
+async def create_ticket_note(ticket_id: int, body: str, private: bool = True) -> Dict[str, Any]:
+    """Create a note for a ticket in Freshservice.
+
+    Args:
+        ticket_id: ID of the ticket.
+        body: Note body (HTML or plain text).
+        private: If True (default) — private note, visible only to agents.
+            Pass False to create a public note visible to the requester.
+    """
     url = f"https://{FRESHSERVICE_DOMAIN}/api/v2/tickets/{ticket_id}/notes"
     headers = get_auth_headers()
     data = {
-        "body": body
+        "body": body,
+        "private": private
     }
     async with httpx.AsyncClient() as client:
         response = await client.post(url, headers=headers, json=data)
