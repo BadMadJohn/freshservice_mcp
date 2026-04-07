@@ -1,0 +1,28 @@
+services:
+  freshservice_mcp:
+    container_name: freshservice_mcp
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    restart: "no"
+
+    ports:
+      - "8012:8012"
+
+    env_file:
+      - .env
+
+    # чтобы слушал на внешнем интерфейсе контейнера (актуально для HTTP/SSE)
+    environment:
+      FASTMCP_HOST: "0.0.0.0"
+      FASTMCP_PORT: "8012"
+
+    entrypoint:
+      - python
+      - -c
+      - |
+        from freshservice_mcp.server import mcp
+        import uvicorn
+        app = mcp.streamable_http_app()   # endpoint будет /mcp
+        uvicorn.run(app, host="0.0.0.0", port=8012)
